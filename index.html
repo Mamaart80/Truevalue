@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyWay Football 1X2 - Arbitrage & Volume Analyzer</title>
+    <meta name="description" content="Scraper en direct des flux d'argent Betfair 1X2 (Arbworld), analyse statistique avancée des volumes, détection de smart money et visualisations graphiques interactives." />
+    <meta property="og:title" content="MoneyWay Football 1X2 - Arbitrage & Volume Analyzer" />
+    <meta property="og:description" content="Scraper en direct des flux d'argent Betfair 1X2 (Arbworld), analyse statistique avancée des volumes, détection de smart money et visualisations graphiques interactives." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        var OrigWebSocket = window.WebSocket;
+        if (!OrigWebSocket) return;
+        
+        function SafeWebSocket(url, protocols) {
+          if (protocols === 'vite-hmr' || (typeof url === 'string' && (url.indexOf('vite-hmr') !== -1 || url.indexOf('token=') !== -1))) {
+            var listeners = {};
+            return {
+              readyState: 1,
+              OPEN: 1,
+              CLOSED: 3,
+              CONNECTING: 0,
+              CLOSING: 2,
+              addEventListener: function(event, fn) {
+                listeners[event] = listeners[event] || [];
+                listeners[event].push(fn);
+                if (event === 'open') {
+                  setTimeout(fn, 0);
+                }
+              },
+              removeEventListener: function(event, fn) {
+                if (listeners[event]) {
+                  listeners[event] = listeners[event].filter(function(f) { return f !== fn; });
+                }
+              },
+              dispatchEvent: function() { return true; },
+              send: function() {},
+              close: function() {
+                this.readyState = 3;
+                (listeners['close'] || []).forEach(function(fn) { fn({ type: 'close' }); });
+              }
+            };
+          }
+          return new OrigWebSocket(url, protocols);
+        }
+        
+        SafeWebSocket.prototype = OrigWebSocket.prototype;
+        SafeWebSocket.OPEN = OrigWebSocket.OPEN;
+        SafeWebSocket.CLOSED = OrigWebSocket.CLOSED;
+        SafeWebSocket.CONNECTING = OrigWebSocket.CONNECTING;
+        SafeWebSocket.CLOSING = OrigWebSocket.CLOSING;
+        window.WebSocket = SafeWebSocket;
+
+        window.addEventListener('error', function(e) {
+          if (e && e.message && e.message.indexOf('WebSocket') !== -1) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+          }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+          if (e && e.reason && String(e.reason).indexOf('WebSocket') !== -1) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+          }
+        }, true);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
